@@ -44,3 +44,49 @@ const dropDown = [
         ],
     },
 ];
+
+//* Have to make a function for inquirer -> inquirer.prompt();
+function inquirerQuestions() {
+    inquirer.prompt(dropDown).then((data) => {
+        if (data.dropDown === "View All Employees") {
+            db.query(
+                'SELECT employee.id, employee.first_name, employee.last_name, tableRole.title, department.department_name, tableRole.salary, CONCAT(manager.first_name, "", manager.last_name) AS manager FROM employee JOIN tableRole ON employee.role_id = tableRole.id JOIN department ON tableRole.department_id = department.id LEFT JOIN employee manager ON manager.id = employee.manager_id;',
+                function (err, results) {
+                console.table(results);
+                inquirerQuestions();
+                }
+            );
+        } else if (data.dropDown === "Add Employee") {
+            addEmployee();
+        }  else if (data.dropDown === "Update Employee Role") {
+            employeeUpdateRole();
+        }  else if (data.dropDown === "View All Roles") {
+            db.query(
+                "SELECT tableRole.id, tableRole.title, tableRole.salary, department.department_name FROM tableRole JOIN department ON tableRole.department_id = department.id",
+                function (err, results) {
+                  console.table(results);
+                  inquirerQuestions();
+                }
+            );
+        } else if (data.dropDown === "Add Department") {
+            addDepartment(); 
+        } else if (data.dropDown === "View All Departments") {
+            db.query(
+                "SELECT department_name FROM department",
+                function (err, results) {
+                    console.table(results);
+                    inquirerQuestions();
+                }
+            );
+        } else if (data.dropDown === "Add Role") {
+            addRole();
+        } else if (data.dropDown === "Quite") {
+            console.log("You have successfully quit the application.");
+        } 
+
+    });
+}
+
+
+
+inquirerQuestions();
